@@ -1,0 +1,69 @@
+[tool.poetry]
+name = "nt29"
+version = "0.1.0"
+description = ""
+authors = ["jxxghp","rainday.proton@proton.me>"]
+keywords = ["nastools","nt29"]
+readme = "README.md"
+packages = [
+    {include = "app"},
+    {include = "*.py"},
+    {include = "package_list.txt"},
+    {include = "requirements.txt"},
+    {include = "third_party.txt"},
+]
+include = [
+    {path = "app"},
+    {path = "config"},
+    {path = "db_scripts"},
+    {path = "docker"},
+    {path = "third_party"},
+    {path = "windows"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "^2.3.2"
+watchdog = "^3.0.0"
+ruamel-yaml = "^0.17.32"
+flask-compress = "^1.13"
+flask-login = "^0.6.2"
+pytz = "^2023.3"
+apscheduler = "^3.10.1"
+undetected-chromedriver = "^3.5.2"
+webdriver-manager = "^4.0.0"
+parse = "^1.19.1"
+dateparser = "^1.1.8"
+cn2an = "^0.5.21"
+fast-bencode = "^1.1.3"
+sqlalchemy = "^2.0.19"
+cacheout = "^0.14.1"
+lxml = "^4.9.3"
+jsonpath = "^0.82"
+alembic = "^1.11.2"
+slack-sdk = "^3.21.3"
+pyvirtualdisplay = "^3.0"
+pyquery = "^2.0.0"
+zhconv = "^1.4.3"
+anitopy = "^2.1.1"
+transmission-rpc = "^4.3.0"
+qbittorrent-api = "^2023.7.52"
+feapder = "^1.8.6"
+flask-restx = "^1.1.0"
+pyjwt = "^2.8.0"
+pycryptodome = "^3.18.0"
+pypushdeer = "^0.0.3"
+slack-bolt = "^1.18.0"
+pikpakapi = "^0.1.2"
+plexapi = "^4.15.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+#[[tool.poetry.source]]
+#name = "aliyun"
+#url = "https://mirrors.aliyun.com/pypi/simple/"
+#priority = "default"
+

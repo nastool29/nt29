@@ -1,0 +1,17 @@
+git
+gcc
+musl-dev
+libxml2-dev
+libxslt-dev
+tzdata
+su-exec
+zip
+curl
+bash
+fuse
+xvfb
+inotify-tools
+chromium-chromedriver
+npm
+dumb-init
+ffmpeg
