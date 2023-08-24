@@ -31,18 +31,18 @@ class Category:
                 if not os.path.exists(self._category_path):
                     shutil.copy(os.path.join(Config().get_inner_config_path(), "default-category.yaml"),
                                 self._category_path)
-                    log.console("【Config】分类配置文件 %s.yaml 不存在，已将配置文件模板复制到配置目录..." % category)
+                    log.Logger().info("【Config】分类配置文件 %s.yaml 不存在，已将配置文件模板复制到配置目录..." % category)
                 with open(self._category_path, mode='r', encoding='utf-8') as f:
                     try:
                         yaml = ruamel.yaml.YAML()
                         self._categorys = yaml.load(f)
                     except Exception as e:
                         ExceptionUtils.exception_traceback(e)
-                        log.console("【Config】%s.yaml 分类配置文件格式出现严重错误！请检查：%s" % (category, str(e)))
+                        log.Logger().info("【Config】%s.yaml 分类配置文件格式出现严重错误！请检查：%s" % (category, str(e)))
                         self._categorys = {}
             except Exception as err:
                 ExceptionUtils.exception_traceback(err)
-                log.console("【Config】加载 %s.yaml 配置出错：%s" % (category, str(err)))
+                log.Logger().info("【Config】加载 %s.yaml 配置出错：%s" % (category, str(err)))
                 return False
 
             if self._categorys:

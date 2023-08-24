@@ -281,7 +281,7 @@ class Subscribe:
             self.dbhelper.delete_rss_tv(rssid=rssid)
 
         # 发送订阅完成的消息
-        log.info("【Rss】%s %s %s 订阅完成，删除订阅..." % (
+        log.Logger().info("【Rss】%s %s %s 订阅完成，删除订阅..." % (
             media.type.value,
             media.get_title_string(),
             media.get_season_string()
@@ -459,7 +459,7 @@ class Subscribe:
         定时将豆瓣订阅转换为TMDB的订阅，并更新订阅的TMDB信息
         """
         # 更新电影
-        log.info("【Subscribe】开始刷新订阅TMDB信息...")
+        log.Logger().info("【Subscribe】开始刷新订阅TMDB信息...")
         rss_movies = self.get_subscribe_movies(state='R')
         for rid, rss_info in rss_movies.items():
             # 跳过模糊匹配的
@@ -476,7 +476,7 @@ class Subscribe:
                                                mtype=MediaType.MOVIE,
                                                cache=False)
             if media_info and media_info.tmdb_id and media_info.title != name:
-                log.info(f"【Subscribe】检测到TMDB信息变化，更新电影订阅 {name} 为 {media_info.title}")
+                log.Logger().info(f"【Subscribe】检测到TMDB信息变化，更新电影订阅 {name} 为 {media_info.title}")
                 # 更新订阅信息
                 self.dbhelper.update_rss_movie_tmdb(rid=rssid,
                                                     tmdbid=media_info.tmdb_id,
@@ -518,7 +518,7 @@ class Subscribe:
                 if total_episode and (name != media_info.title or total != total_episode):
                     # 新的缺失集数
                     lack_episode = total_episode - (total - lack)
-                    log.info(
+                    log.Logger().info(
                         f"【Subscribe】检测到TMDB信息变化，更新电视剧订阅 {name} 为 {media_info.title}，总集数为：{total_episode}")
                     # 更新订阅信息
                     self.dbhelper.update_rss_tv_tmdb(rid=rssid,
@@ -534,7 +534,7 @@ class Subscribe:
                     self.dbhelper.update_rss_tv_episodes(rid=rssid, episodes=range(total - lack + 1, total + 1))
                     # 清除TMDB缓存
                     self.metahelper.delete_meta_data_by_tmdbid(media_info.tmdb_id)
-        log.info("【Subscribe】订阅TMDB信息刷新完成")
+        log.Logger().info("【Subscribe】订阅TMDB信息刷新完成")
 
     def __get_media_info(self, tmdbid, name, year, mtype, cache=True):
         """
@@ -578,7 +578,7 @@ class Subscribe:
         else:
             rss_movies = self.get_subscribe_movies(state=state)
         if rss_movies:
-            log.info("【Subscribe】共有 %s 个电影订阅需要检索" % len(rss_movies))
+            log.Logger().info("【Subscribe】共有 %s 个电影订阅需要检索" % len(rss_movies))
         for rid, rss_info in rss_movies.items():
             # 跳过模糊匹配的
             if rss_info.get("fuzzy_match"):
@@ -609,7 +609,7 @@ class Subscribe:
                 exist_flag, no_exists, _ = self.downloader.check_exists_medias(meta_info=media_info)
                 # 已经存在
                 if exist_flag:
-                    log.info("【Subscribe】电影 %s 已存在" % media_info.get_title_string())
+                    log.Logger().info("【Subscribe】电影 %s 已存在" % media_info.get_title_string())
                     self.finish_rss_subscribe(rssid=rssid, media=media_info)
                     continue
             else:
@@ -656,7 +656,7 @@ class Subscribe:
         else:
             rss_tvs = self.get_subscribe_tvs(state=state)
         if rss_tvs:
-            log.info("【Subscribe】共有 %s 个电视剧订阅需要检索" % len(rss_tvs))
+            log.Logger().info("【Subscribe】共有 %s 个电视剧订阅需要检索" % len(rss_tvs))
         rss_no_exists = {}
         for rid, rss_info in rss_tvs.items():
             # 跳过模糊匹配的
@@ -723,7 +723,7 @@ class Subscribe:
                     # 已全部存在
                     if not library_no_exists \
                             or not library_no_exists.get(media_info.tmdb_id):
-                        log.info("【Subscribe】电视剧 %s 订阅剧集已全部存在" % (
+                        log.Logger().info("【Subscribe】电视剧 %s 订阅剧集已全部存在" % (
                             media_info.get_title_string()))
                         # 完成订阅
                         self.finish_rss_subscribe(rssid=rss_info.get("id"),
@@ -734,7 +734,7 @@ class Subscribe:
                                                                   source=library_no_exists,
                                                                   title=media_info.tmdb_id)
                 if rss_no_exists.get(media_info.tmdb_id):
-                    log.info("【Subscribe】%s 订阅缺失季集：%s" % (
+                    log.Logger().info("【Subscribe】%s 订阅缺失季集：%s" % (
                         media_info.get_title_string(),
                         rss_no_exists.get(media_info.tmdb_id)
                     ))
@@ -838,7 +838,7 @@ class Subscribe:
         for info in seasoninfo:
             if str(info.get("season")) == media_info.get_season_seq():
                 if info.get("episodes"):
-                    log.info("【Subscribe】更新电视剧 %s %s 缺失集数为 %s" % (
+                    log.Logger().info("【Subscribe】更新电视剧 %s %s 缺失集数为 %s" % (
                         media_info.get_title_string(),
                         media_info.get_season_string(),
                         len(info.get("episodes"))))

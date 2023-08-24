@@ -26,7 +26,7 @@ class MediaServer:
             'app.mediaserver.client',
             filter_func=lambda _, obj: hasattr(obj, 'schema')
         )
-        log.debug(f"【MediaServer】加载媒体服务器：{self._mediaserver_schemas}")
+        log.Logger().debug(f"【MediaServer】加载媒体服务器：{self._mediaserver_schemas}")
         self.init_config()
 
     def init_config(self):
@@ -168,7 +168,7 @@ class MediaServer:
             return
         with lock:
             # 开始进度条
-            log.info("【MediaServer】开始同步媒体库数据...")
+            log.Logger().info("【MediaServer】开始同步媒体库数据...")
             self.progress.start("mediasync")
             self.progress.update(ptype="mediasync", text="请稍候...")
             # 汇总统计
@@ -206,7 +206,7 @@ class MediaServer:
                                  value=100,
                                  text="媒体库数据同步完成，同步数量：%s" % total_count)
             self.progress.end("mediasync")
-            log.info("【MediaServer】媒体库数据同步完成，同步数量：%s" % total_count)
+            log.Logger().info("【MediaServer】媒体库数据同步完成，同步数量：%s" % total_count)
 
     def check_item_exists(self, title, year=None, tmdbid=None):
         """

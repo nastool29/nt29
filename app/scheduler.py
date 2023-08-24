@@ -72,39 +72,39 @@ class Scheduler:
                                                "cron",
                                                hour=start_hour,
                                                minute=start_minute)
-                        log.info("站点自动签到服务时间范围随机模式启动，起始时间于%s:%s" % (
+                        log.Logger().info("站点自动签到服务时间范围随机模式启动，起始时间于%s:%s" % (
                             str(start_hour).rjust(2, '0'), str(start_minute).rjust(2, '0')))
                     except Exception as e:
-                        log.info("站点自动签到时间 时间范围随机模式 配置格式错误：%s %s" % (ptsignin_cron, str(e)))
+                        log.Logger().info("站点自动签到时间 时间范围随机模式 配置格式错误：%s %s" % (ptsignin_cron, str(e)))
                 elif ptsignin_cron.find(':') != -1:
                     try:
                         hour = int(ptsignin_cron.split(":")[0])
                         minute = int(ptsignin_cron.split(":")[1])
                     except Exception as e:
-                        log.info("站点自动签到时间 配置格式错误：%s" % str(e))
+                        log.Logger().info("站点自动签到时间 配置格式错误：%s" % str(e))
                         hour = minute = 0
                     self.SCHEDULER.add_job(SiteSignin().signin,
                                            "cron",
                                            hour=hour,
                                            minute=minute)
-                    log.info("站点自动签到服务启动")
+                    log.Logger().info("站点自动签到服务启动")
                 else:
                     try:
                         hours = float(ptsignin_cron)
                     except Exception as e:
-                        log.info("站点自动签到时间 配置格式错误：%s" % str(e))
+                        log.Logger().info("站点自动签到时间 配置格式错误：%s" % str(e))
                         hours = 0
                     if hours:
                         self.SCHEDULER.add_job(SiteSignin().signin,
                                                "interval",
                                                hours=hours)
-                        log.info("站点自动签到服务启动")
+                        log.Logger().info("站点自动签到服务启动")
 
             # 下载文件转移
             pt_monitor = self._pt.get('pt_monitor')
             if pt_monitor:
                 self.SCHEDULER.add_job(Downloader().transfer, 'interval', seconds=PT_TRANSFER_INTERVAL)
-                log.info("下载文件转移服务启动")
+                log.Logger().info("下载文件转移服务启动")
 
             # RSS下载器
             pt_check_interval = self._pt.get('pt_check_interval')
@@ -115,13 +115,13 @@ class Scheduler:
                     try:
                         pt_check_interval = round(float(pt_check_interval))
                     except Exception as e:
-                        log.error("RSS订阅周期 配置格式错误：%s" % str(e))
+                        log.Logger().error("RSS订阅周期 配置格式错误：%s" % str(e))
                         pt_check_interval = 0
                 if pt_check_interval:
                     if pt_check_interval < 300:
                         pt_check_interval = 300
                     self.SCHEDULER.add_job(Rss().rssdownload, 'interval', seconds=pt_check_interval)
-                    log.info("RSS订阅服务启动")
+                    log.Logger().info("RSS订阅服务启动")
 
             # RSS订阅定时检索
             search_rss_interval = self._pt.get('search_rss_interval')
@@ -132,13 +132,13 @@ class Scheduler:
                     try:
                         search_rss_interval = round(float(search_rss_interval))
                     except Exception as e:
-                        log.error("订阅定时搜索周期 配置格式错误：%s" % str(e))
+                        log.Logger().error("订阅定时搜索周期 配置格式错误：%s" % str(e))
                         search_rss_interval = 0
                 if search_rss_interval:
                     if search_rss_interval < 6:
                         search_rss_interval = 6
                     self.SCHEDULER.add_job(Subscribe().subscribe_search_all, 'interval', hours=search_rss_interval)
-                    log.info("订阅定时搜索服务启动")
+                    log.Logger().info("订阅定时搜索服务启动")
 
         # 豆瓣电影同步
         if self._douban:
@@ -151,11 +151,11 @@ class Scheduler:
                         try:
                             douban_interval = float(douban_interval)
                         except Exception as e:
-                            log.info("豆瓣同步服务启动失败：%s" % str(e))
+                            log.Logger().info("豆瓣同步服务启动失败：%s" % str(e))
                             douban_interval = 0
                 if douban_interval:
                     self.SCHEDULER.add_job(DoubanSync().sync, 'interval', hours=douban_interval)
-                    log.info("豆瓣同步服务启动")
+                    log.Logger().info("豆瓣同步服务启动")
 
         # 媒体库同步
         if self._media:
@@ -168,11 +168,11 @@ class Scheduler:
                         try:
                             mediasync_interval = round(float(mediasync_interval))
                         except Exception as e:
-                            log.info("豆瓣同步服务启动失败：%s" % str(e))
+                            log.Logger().info("豆瓣同步服务启动失败：%s" % str(e))
                             mediasync_interval = 0
                 if mediasync_interval:
                     self.SCHEDULER.add_job(MediaServer().sync_mediaserver, 'interval', hours=mediasync_interval)
-                    log.info("媒体库同步服务启动")
+                    log.Logger().info("媒体库同步服务启动")
 
         # 元数据定时保存
         self.SCHEDULER.add_job(MetaHelper().save_meta_data, 'interval', seconds=METAINFO_SAVE_INTERVAL)
@@ -223,14 +223,14 @@ class Scheduler:
         day = datetime.datetime.now().day
         # 随机数从1秒开始，不在整点签到
         second = random.randint(1, 59)
-        log.info("站点自动签到时间 即将在%s-%s-%s,%s:%s:%s签到" % (
+        log.Logger().info("站点自动签到时间 即将在%s-%s-%s,%s:%s:%s签到" % (
             str(year), str(month), str(day), str(hour), str(minute), str(second)))
         if hour < 0 or hour > 24:
             hour = -1
         if minute < 0 or minute > 60:
             minute = -1
         if hour < 0 or minute < 0:
-            log.warn("站点自动签到时间 配置格式错误：不启动任务")
+            log.Logger().warn("站点自动签到时间 配置格式错误：不启动任务")
             return
         self.SCHEDULER.add_job(SiteSignin().signin,
                                "date",
@@ -244,7 +244,7 @@ def run_scheduler():
     try:
         Scheduler().run_service()
     except Exception as err:
-        log.error("启动定时服务失败：%s - %s" % (str(err), traceback.format_exc()))
+        log.Logger().error("启动定时服务失败：%s - %s" % (str(err), traceback.format_exc()))
 
 
 def stop_scheduler():
@@ -254,7 +254,7 @@ def stop_scheduler():
     try:
         Scheduler().stop_service()
     except Exception as err:
-        log.debug("停止定时服务失败：%s" % str(err))
+        log.Logger().debug("停止定时服务失败：%s" % str(err))
 
 
 def restart_scheduler():

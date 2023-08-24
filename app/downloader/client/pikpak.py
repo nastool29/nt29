@@ -49,10 +49,10 @@ class PikPak(_IDownloadClient):
         try:
             asyncio.run(self.downclient.login())
             if self.downclient.user_id is None:
-                log.info("PikPak 登录失败")
+                log.Logger().info("PikPak 登录失败")
                 return False
         except Exception as err:
-            log.error("PikPak 登录出错：%s" % str(err))
+            log.Logger().error("PikPak 登录出错：%s" % str(err))
             return False
 
         return True
@@ -106,7 +106,7 @@ class PikPak(_IDownloadClient):
                 ))
                 return task["task"]["id"]
         except Exception as e:
-            log.error("PikPak 添加离线下载任务失败: %s" % str(e))
+            log.Logger().error("PikPak 添加离线下载任务失败: %s" % str(e))
             return None
 
     # 需要完成

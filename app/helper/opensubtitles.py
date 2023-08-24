@@ -43,11 +43,11 @@ class OpenSubtitles:
         """
         chrome = ChromeHelper()
         if not chrome.get_status():
-            log.error("【Subtitle】未找到浏览器内核，当前环境无法检索opensubtitles字幕！")
+            log.Logger().error("【Subtitle】未找到浏览器内核，当前环境无法检索opensubtitles字幕！")
             return []
         # 访问页面
         if not chrome.visit(url):
-            log.error("【Subtitle】无法连接opensubtitles.org！")
+            log.Logger().error("【Subtitle】无法连接opensubtitles.org！")
             return []
         # 源码
         html_text = chrome.get_html()

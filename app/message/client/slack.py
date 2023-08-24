@@ -45,25 +45,25 @@ class Slack(_IMessageClient):
             @slack_app.event("message")
             def slack_message(message):
                 local_res = requests.post(self._ds_url, json=message, timeout=10)
-                log.debug("【Slack】message: %s processed, response is: %s" % (message, local_res.text))
+                log.Logger().debug("【Slack】message: %s processed, response is: %s" % (message, local_res.text))
 
             @slack_app.action(re.compile(r"actionId-\d+"))
             def slack_action(ack, body):
                 ack()
                 local_res = requests.post(self._ds_url, json=body, timeout=60)
-                log.debug("【Slack】message: %s processed, response is: %s" % (body, local_res.text))
+                log.Logger().debug("【Slack】message: %s processed, response is: %s" % (body, local_res.text))
 
             @slack_app.event("app_mention")
             def slack_mention(say, body):
                 say(f"收到，请稍等... <@{body.get('event', {}).get('user')}>")
                 local_res = requests.post(self._ds_url, json=body, timeout=10)
-                log.debug("【Slack】message: %s processed, response is: %s" % (body, local_res.text))
+                log.Logger().debug("【Slack】message: %s processed, response is: %s" % (body, local_res.text))
 
             @slack_app.shortcut(re.compile(r"/*"))
             def slack_shortcut(ack, body):
                 ack()
                 local_res = requests.post(self._ds_url, json=body, timeout=10)
-                log.debug("【Slack】message: %s processed, response is: %s" % (body, local_res.text))
+                log.Logger().debug("【Slack】message: %s processed, response is: %s" % (body, local_res.text))
 
             # 启动服务
             if self._interactive:
@@ -73,10 +73,10 @@ class Slack(_IMessageClient):
                         self._client_config.get("app_token")
                     )
                     self._service.connect()
-                    log.info("Slack消息接收服务启动")
+                    log.Logger().info("Slack消息接收服务启动")
                 except Exception as err:
                     ExceptionUtils.exception_traceback(err)
-                    log.error("Slack消息接收服务启动失败: %s" % str(err))
+                    log.Logger().error("Slack消息接收服务启动失败: %s" % str(err))
 
     @classmethod
     def match(cls, ctype):
@@ -88,7 +88,7 @@ class Slack(_IMessageClient):
                 self._service.close()
             except Exception as err:
                 print(str(err))
-            log.info("Slack消息接收服务已停止")
+            log.Logger().info("Slack消息接收服务已停止")
 
     def send_msg(self, title, text="", image="", url="", user_id=""):
         """

@@ -66,7 +66,7 @@ class Transmission(_IDownloadClient):
             return trt
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
-            log.error(f"【{self.client_type}】transmission连接出错：{str(err)}")
+            log.Logger().error(f"【{self.client_type}】transmission连接出错：{str(err)}")
             return None
 
     def get_status(self):
@@ -153,7 +153,7 @@ class Transmission(_IDownloadClient):
         # 打标签
         try:
             self.trc.change_torrent(labels=tags, ids=ids)
-            log.info(f"【{self.client_type}】设置transmission种子标签成功")
+            log.Logger().info(f"【{self.client_type}】设置transmission种子标签成功")
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
 
@@ -238,7 +238,7 @@ class Transmission(_IDownloadClient):
         for torrent in torrents:
             # 3.0版本以下的Transmission没有labels
             if not hasattr(torrent, "labels"):
-                log.error(f"【{self.client_type}】当前transmission版本可能过低，无labels属性，请安装3.0以上版本！")
+                log.Logger().error(f"【{self.client_type}】当前transmission版本可能过低，无labels属性，请安装3.0以上版本！")
                 break
             if torrent.labels and "已整理" in torrent.labels:
                 continue

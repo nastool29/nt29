@@ -883,17 +883,17 @@ class WebAction:
                     del_flag, del_msg = self.delete_media_file(
                         source_path, source_filename)
                     if not del_flag:
-                        log.error(f"【History】{del_msg}")
+                        log.Logger().error(f"【History】{del_msg}")
                     else:
-                        log.info(f"【History】{del_msg}")
+                        log.Logger().info(f"【History】{del_msg}")
                 if flag in ["del_dest", "del_all"]:
                     if dest_path and dest_filename:
                         del_flag, del_msg = self.delete_media_file(
                             dest_path, dest_filename)
                         if not del_flag:
-                            log.error(f"【History】{del_msg}")
+                            log.Logger().error(f"【History】{del_msg}")
                         else:
-                            log.info(f"【History】{del_msg}")
+                            log.Logger().info(f"【History】{del_msg}")
                     else:
                         meta_info = MetaInfo(title=source_filename)
                         meta_info.title = paths[0].TITLE
@@ -4034,9 +4034,9 @@ class WebAction:
                 del_flag, del_msg = self.delete_media_file(filedir=os.path.dirname(file),
                                                            filename=os.path.basename(file))
                 if not del_flag:
-                    log.error(f"【MediaFile】{del_msg}")
+                    log.Logger().error(f"【MediaFile】{del_msg}")
                 else:
-                    log.info(f"【MediaFile】{del_msg}")
+                    log.Logger().info(f"【MediaFile】{del_msg}")
         return {"code": 0}
 
     @staticmethod

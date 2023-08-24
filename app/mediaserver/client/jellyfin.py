@@ -58,11 +58,11 @@ class Jellyfin(_IMediaClient):
             if res:
                 return res.json()
             else:
-                log.error(f"【{self.server_type}】Library/VirtualFolders 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Library/VirtualFolders 未获取到返回数据")
                 return []
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Library/VirtualFolders 出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Library/VirtualFolders 出错：" + str(e))
             return []
 
     def get_user_count(self):
@@ -77,11 +77,11 @@ class Jellyfin(_IMediaClient):
             if res:
                 return len(res.json())
             else:
-                log.error(f"【{self.server_type}】Users 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Users 未获取到返回数据")
                 return 0
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Users出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Users出错：" + str(e))
             return 0
 
     def get_admin_user(self):
@@ -99,10 +99,10 @@ class Jellyfin(_IMediaClient):
                     if user.get("Policy", {}).get("IsAdministrator"):
                         return user.get("Id")
             else:
-                log.error(f"【{self.server_type}】Users 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Users 未获取到返回数据")
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Users出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Users出错：" + str(e))
         return None
 
     def get_activity_log(self, num):
@@ -133,11 +133,11 @@ class Jellyfin(_IMediaClient):
                                     "date": SystemUtils.get_local_time(event_date)}
                         ret_array.append(activity)
             else:
-                log.error(f"【{self.server_type}】System/ActivityLog/Entries 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】System/ActivityLog/Entries 未获取到返回数据")
                 return []
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接System/ActivityLog/Entries出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接System/ActivityLog/Entries出错：" + str(e))
             return []
         return ret_array
 
@@ -154,11 +154,11 @@ class Jellyfin(_IMediaClient):
             if res:
                 return res.json()
             else:
-                log.error(f"【{self.server_type}】Items/Counts 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Items/Counts 未获取到返回数据")
                 return {}
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items/Counts出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items/Counts出错：" + str(e))
             return {}
 
     def __get_jellyfin_series_id_by_name(self, name, year):
@@ -180,7 +180,7 @@ class Jellyfin(_IMediaClient):
                             return res_item.get('Id')
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items出错：" + str(e))
             return None
         return ""
 
@@ -209,7 +209,7 @@ class Jellyfin(_IMediaClient):
                             return series_id, res_item.get('Id')
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Shows/Id/Seasons出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Shows/Id/Seasons出错：" + str(e))
             return None, None
         return "", ""
 
@@ -238,7 +238,7 @@ class Jellyfin(_IMediaClient):
                             return ret_movies
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items出错：" + str(e))
             return None
         return []
 
@@ -276,7 +276,7 @@ class Jellyfin(_IMediaClient):
                 return exists_episodes
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Shows/Id/Episodes出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Shows/Id/Episodes出错：" + str(e))
             return None
         return []
 
@@ -314,11 +314,11 @@ class Jellyfin(_IMediaClient):
                     if image.get("ProviderName") == "TheMovieDb" and image.get("Type") == image_type:
                         return image.get("Url")
             else:
-                log.error(f"【{self.server_type}】Items/RemoteImages 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Items/RemoteImages 未获取到返回数据")
                 return None
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items/Id/RemoteImages出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items/Id/RemoteImages出错：" + str(e))
             return None
         return None
 
@@ -334,10 +334,10 @@ class Jellyfin(_IMediaClient):
             if res:
                 return True
             else:
-                log.info(f"【{self.server_type}】刷新媒体库失败，无法连接Jellyfin！")
+                log.Logger().info(f"【{self.server_type}】刷新媒体库失败，无法连接Jellyfin！")
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Library/Refresh出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Library/Refresh出错：" + str(e))
             return False
 
     def refresh_library_by_items(self, items):
@@ -414,7 +414,7 @@ class Jellyfin(_IMediaClient):
                             yield item
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Users/Items出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Users/Items出错：" + str(e))
         yield {}
 
     def get_playing_sessions(self):

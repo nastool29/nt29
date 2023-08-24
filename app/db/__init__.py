@@ -12,19 +12,19 @@ def init_db():
     """
     初始化数据库
     """
-    log.console('开始初始化数据库...')
+    log.Logger().info('开始初始化数据库...')
     MediaDb().init_db()
     MainDb().init_db()
-    log.console('数据库初始化完成')
+    log.Logger().info('数据库初始化完成')
 
 
 def init_data():
     """
     初始化数据
     """
-    log.console('开始初始化数据...')
+    log.Logger().info('开始初始化数据...')
     MainDb().init_data()
-    log.console('数据初始化完成')
+    log.Logger().info('数据初始化完成')
 
 
 def update_db():
@@ -33,7 +33,7 @@ def update_db():
     """
     db_location = os.path.join(Config().get_config_path(), 'user.db')
     script_location = os.path.join(Config().get_root_path(), 'db_scripts')
-    log.console('开始更新数据库...')
+    log.Logger().info('开始更新数据库...')
     try:
         alembic_cfg = AlembicConfig()
         alembic_cfg.set_main_option('script_location', script_location)
@@ -41,4 +41,4 @@ def update_db():
         alembic_upgrade(alembic_cfg, 'head')
     except Exception as e:
         print(str(e))
-    log.console('数据库更新完成')
+    log.Logger().info('数据库更新完成')

@@ -52,7 +52,7 @@ class NexusPhpSiteUserInfo(_ISiteUserInfo):
         if message_labels:
             message_text = message_labels[0].xpath("string(.)")
 
-            log.debug(f"【Sites】{self.site_name} 消息原始信息 {message_text}")
+            log.Logger().debug(f"【Sites】{self.site_name} 消息原始信息 {message_text}")
             message_unread_match = re.findall(r"[^Date](信息箱\s*|\(|你有\xa0)(\d+)", message_text)
 
             if message_unread_match and len(message_unread_match[-1]) == 2:

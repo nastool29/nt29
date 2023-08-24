@@ -233,7 +233,7 @@ class TorrentSpider(feapder.AirSpider):
             # 检索Url
             searchurl = self.domain + str(torrentspath).format(**inputs_dict)
 
-        log.info(f"【Spider】开始请求：{searchurl}")
+        log.Logger().info(f"【Spider】开始请求：{searchurl}")
         yield feapder.Request(url=searchurl,
                               use_session=True,
                               render=self.render)
@@ -575,7 +575,7 @@ class TorrentSpider(feapder.AirSpider):
             self.Getelapsed_date(torrent)
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
-            log.error("【Spider】%s 检索出现错误：%s" % (self.indexername, str(err)))
+            log.Logger().error("【Spider】%s 检索出现错误：%s" % (self.indexername, str(err)))
         return self.torrents_info
 
     @staticmethod
@@ -645,6 +645,6 @@ class TorrentSpider(feapder.AirSpider):
 
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
-            log.warn("【Spider】错误：%s" % str(err))
+            log.Logger().warn("【Spider】错误：%s" % str(err))
         finally:
             self.is_complete = True

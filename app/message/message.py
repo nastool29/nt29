@@ -28,7 +28,7 @@ class Message(object):
             'app.message.client',
             filter_func=lambda _, obj: hasattr(obj, 'schema')
         )
-        log.debug(f"【Message】加载消息服务：{self._message_schemas}")
+        log.Logger().debug(f"【Message】加载消息服务：{self._message_schemas}")
         self.init_config()
 
     def init_config(self):
@@ -95,7 +95,7 @@ class Message(object):
                                                                   text="这是一条测试消息",
                                                                   url="https://github.com/jxxghp/nas-tools")
         if not state:
-            log.error(f"【Message】{ctype} 发送测试消息失败：%s" % ret_msg)
+            log.Logger().error(f"【Message】{ctype} 发送测试消息失败：%s" % ret_msg)
         return state
 
     def get_webhook_ignore(self):
@@ -118,7 +118,7 @@ class Message(object):
         if not client or not client.get('client'):
             return None
         cname = client.get('name')
-        log.info(f"【Message】发送消息 {cname}：title={title}, text={text}")
+        log.Logger().info(f"【Message】发送消息 {cname}：title={title}, text={text}")
         if self._domain:
             if url:
                 if not url.startswith("http"):
@@ -133,7 +133,7 @@ class Message(object):
                                                        url=url,
                                                        user_id=user_id)
         if not state:
-            log.error(f"【Message】{cname} 消息发送失败：%s" % ret_msg)
+            log.Logger().error(f"【Message】{cname} 消息发送失败：%s" % ret_msg)
         return state
 
     def send_channel_msg(self, channel, title, text="", image="", url="", user_id=""):
@@ -168,13 +168,13 @@ class Message(object):
         if not client or not client.get('client'):
             return None
         cname = client.get('name')
-        log.info(f"【Message】发送消息 {cname}：title={title}")
+        log.Logger().info(f"【Message】发送消息 {cname}：title={title}")
         state, ret_msg = client.get('client').send_list_msg(medias=medias,
                                                             user_id=user_id,
                                                             title=title,
                                                             url=self._domain)
         if not state:
-            log.error(f"【Message】{cname} 发送消息失败：%s" % ret_msg)
+            log.Logger().error(f"【Message】{cname} 发送消息失败：%s" % ret_msg)
         return state
 
     def send_channel_list_msg(self, channel, title, medias: list, user_id=""):

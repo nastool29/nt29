@@ -229,11 +229,11 @@ class Telegram(_IMessageClient):
             if res is not None:
                 json = res.json()
                 if json.get("ok"):
-                    log.info("【Telegram】Webhook 设置成功，地址为：%s" % self._webhook_url)
+                    log.Logger().info("【Telegram】Webhook 设置成功，地址为：%s" % self._webhook_url)
                 else:
-                    log.error("【Telegram】Webhook 设置失败：" % json.get("description"))
+                    log.Logger().error("【Telegram】Webhook 设置失败：" % json.get("description"))
             else:
-                log.error("【Telegram】Webhook 设置失败：网络连接故障！")
+                log.Logger().error("【Telegram】Webhook 设置失败：网络连接故障！")
 
     def __get_bot_webhook(self):
         """
@@ -247,11 +247,11 @@ class Telegram(_IMessageClient):
                 result = res.json().get("result") or {}
                 webhook_url = result.get("url") or ""
                 if webhook_url:
-                    log.info("【Telegram】Webhook 地址为：%s" % webhook_url)
+                    log.Logger().info("【Telegram】Webhook 地址为：%s" % webhook_url)
                 pending_update_count = result.get("pending_update_count")
                 last_error_message = result.get("last_error_message")
                 if pending_update_count and last_error_message:
-                    log.warn("【Telegram】Webhook 有 %s 条消息挂起，最后一次失败原因为：%s" % (
+                    log.Logger().warn("【Telegram】Webhook 有 %s 条消息挂起，最后一次失败原因为：%s" % (
                         pending_update_count, last_error_message))
                 if webhook_url == self._webhook_url:
                     return 1
@@ -275,7 +275,7 @@ class Telegram(_IMessageClient):
             return False
 
     def __start_telegram_message_proxy(self, event: Event):
-        log.info("Telegram消息接收服务启动")
+        log.Logger().info("Telegram消息接收服务启动")
 
         long_poll_timeout = 5
 
@@ -287,12 +287,12 @@ class Telegram(_IMessageClient):
                     for msg in res.json().get("result", []):
                         # 无论本地是否成功，先更新offset，即消息最多成功消费一次
                         _offset = msg["update_id"] + 1
-                        log.debug("【Telegram】接收到消息: %s" % msg)
+                        log.Logger().debug("【Telegram】接收到消息: %s" % msg)
                         local_res = requests.post(_ds_url, json=msg, timeout=10)
-                        log.debug("【Telegram】message: %s processed, response is: %s" % (msg, local_res.text))
+                        log.Logger().debug("【Telegram】message: %s processed, response is: %s" % (msg, local_res.text))
             except Exception as e:
                 ExceptionUtils.exception_traceback(e)
-                log.error("【Telegram】消息接收出现错误: %s" % e)
+                log.Logger().error("【Telegram】消息接收出现错误: %s" % e)
             return _offset
 
         offset = 0
@@ -302,7 +302,7 @@ class Telegram(_IMessageClient):
             sc_url = "https://api.telegram.org/bot%s/getUpdates?" % self._telegram_token
             ds_url = "http://127.0.0.1:%s/telegram" % web_port
             if not self._enabled:
-                log.info("Telegram消息接收服务已停止")
+                log.Logger().info("Telegram消息接收服务已停止")
                 break
 
             i = 0

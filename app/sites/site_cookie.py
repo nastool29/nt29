@@ -147,7 +147,7 @@ class SiteCookie(object):
                             # 自动OCR识别验证码
                             captcha = self.get_captcha_text(chrome, code_url)
                             if captcha:
-                                log.info("【Sites】验证码地址为：%s，识别结果：%s" % (code_url, captcha))
+                                log.Logger().info("【Sites】验证码地址为：%s，识别结果：%s" % (code_url, captcha))
                             else:
                                 return None, None, "验证码识别失败"
                         else:
@@ -158,7 +158,7 @@ class SiteCookie(object):
                                 if self.get_code(code_key):
                                     # 用户输入了
                                     captcha = self.get_code(code_key)
-                                    log.info("【Sites】接收到验证码：%s" % captcha)
+                                    log.Logger().info("【Sites】接收到验证码：%s" % captcha)
                                     self.progress.update(ptype='sitecookie',
                                                          text="接收到验证码：%s" % captcha)
                                     break
@@ -251,9 +251,9 @@ class SiteCookie(object):
         self.progress.start('sitecookie')
         for site in sites:
             if not site.get("signurl") and not site.get("rssurl"):
-                log.info("【Sites】%s 未设置地址，跳过" % site.get("name"))
+                log.Logger().info("【Sites】%s 未设置地址，跳过" % site.get("name"))
                 continue
-            log.info("【Sites】开始更新 %s Cookie和User-Agent ..." % site.get("name"))
+            log.Logger().info("【Sites】开始更新 %s Cookie和User-Agent ..." % site.get("name"))
             self.progress.update(ptype='sitecookie',
                                  text="开始更新 %s Cookie和User-Agent ..." % site.get("name"))
             # 登录页面地址
@@ -272,7 +272,7 @@ class SiteCookie(object):
             # 更新进度
             curr_num += 1
             if not cookie:
-                log.error("【Sites】获取 %s 信息失败：%s" % (site.get("name"), msg))
+                log.Logger().error("【Sites】获取 %s 信息失败：%s" % (site.get("name"), msg))
                 messages.append("%s %s" % (site.get("name"), msg))
                 self.progress.update(ptype='sitecookie',
                                      value=round(100 * (curr_num / site_num)),
@@ -280,7 +280,7 @@ class SiteCookie(object):
                 retcode = 1
             else:
                 self.dbhelpter.update_site_cookie_ua(site.get("id"), cookie, ua)
-                log.info("【Sites】更新 %s 的Cookie和User-Agent成功" % site.get("name"))
+                log.Logger().info("【Sites】更新 %s 的Cookie和User-Agent成功" % site.get("name"))
                 messages.append("%s %s" % (site.get("name"), msg or "更新Cookie和User-Agent成功"))
                 self.progress.update(ptype='sitecookie',
                                      value=round(100 * (curr_num / site_num)),

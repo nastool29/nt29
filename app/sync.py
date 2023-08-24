@@ -88,23 +88,23 @@ class Sync(object):
                 target_path = sync_item.DEST
                 unknown_path = sync_item.UNKNOWN
                 if target_path and unknown_path:
-                    log.info("【Sync】读取到监控目录：%s，目的目录：%s，未识别目录：%s，转移方式：%s" % (
+                    log.Logger().info("【Sync】读取到监控目录：%s，目的目录：%s，未识别目录：%s，转移方式：%s" % (
                         monpath, target_path, unknown_path, path_syncmode.value))
                 elif target_path:
-                    log.info(
+                    log.Logger().info(
                         "【Sync】读取到监控目录：%s，目的目录：%s，转移方式：%s" % (monpath, target_path, path_syncmode.value))
                 else:
-                    log.info("【Sync】读取到监控目录：%s，转移方式：%s" % (monpath, path_syncmode.value))
+                    log.Logger().info("【Sync】读取到监控目录：%s，转移方式：%s" % (monpath, path_syncmode.value))
                 if not enabled:
-                    log.info("【Sync】%s 不进行监控和同步：手动关闭" % monpath)
+                    log.Logger().info("【Sync】%s 不进行监控和同步：手动关闭" % monpath)
                     continue
                 if only_link:
-                    log.info("【Sync】%s 不进行识别和重命名" % monpath)
+                    log.Logger().info("【Sync】%s 不进行识别和重命名" % monpath)
                 if target_path and not os.path.exists(target_path):
-                    log.info("【Sync】目的目录不存在，正在创建：%s" % target_path)
+                    log.Logger().info("【Sync】目的目录不存在，正在创建：%s" % target_path)
                     os.makedirs(target_path)
                 if unknown_path and not os.path.exists(unknown_path):
-                    log.info("【Sync】未识别目录不存在，正在创建：%s" % unknown_path)
+                    log.Logger().info("【Sync】未识别目录不存在，正在创建：%s" % unknown_path)
                     os.makedirs(unknown_path)
                 # 登记关系
                 if os.path.exists(monpath):
@@ -116,7 +116,7 @@ class Sync(object):
                         'syncmod': path_syncmode
                     }
                 else:
-                    log.error("【Sync】%s 目录不存在！" % monpath)
+                    log.Logger().error("【Sync】%s 目录不存在！" % monpath)
 
     def get_sync_dirs(self):
         """
@@ -138,7 +138,7 @@ class Sync(object):
             try:
                 if not os.path.exists(event_path):
                     return
-                log.debug("【Sync】文件%s：%s" % (text, event_path))
+                log.Logger().debug("【Sync】文件%s：%s" % (text, event_path))
                 # 判断是否处理过了
                 need_handler_flag = False
                 try:
@@ -149,7 +149,7 @@ class Sync(object):
                 finally:
                     lock.release()
                 if not need_handler_flag:
-                    log.debug("【Sync】文件已处理过：%s" % event_path)
+                    log.Logger().debug("【Sync】文件已处理过：%s" % event_path)
                     return
                 # 不是监控目录下的文件不处理
                 is_monitor_file = False
@@ -195,16 +195,16 @@ class Sync(object):
                 if onlylink:
                     if self.dbhelper.is_sync_in_history(event_path, target_path):
                         return
-                    log.info("【Sync】开始同步 %s" % event_path)
+                    log.Logger().info("【Sync】开始同步 %s" % event_path)
                     ret, msg = self.filetransfer.link_sync_file(src_path=monitor_dir,
                                                                 in_file=event_path,
                                                                 target_dir=target_path,
                                                                 sync_transfer_mode=sync_mode)
                     if ret != 0:
-                        log.warn("【Sync】%s 同步失败，错误码：%s" % (event_path, ret))
+                        log.Logger().warn("【Sync】%s 同步失败，错误码：%s" % (event_path, ret))
                     elif not msg:
                         self.dbhelper.insert_sync_history(event_path, monitor_dir, target_path)
-                        log.info("【Sync】%s 同步完成" % event_path)
+                        log.Logger().info("【Sync】%s 同步完成" % event_path)
                 # 识别转移
                 else:
                     # 不是媒体文件不处理
@@ -223,7 +223,7 @@ class Sync(object):
                                                                         unknown_dir=unknown_path,
                                                                         rmt_mode=sync_mode)
                         if not ret:
-                            log.warn("【Sync】%s 转移失败：%s" % (event_path, ret_msg))
+                            log.Logger().warn("【Sync】%s 转移失败：%s" % (event_path, ret_msg))
                     else:
                         try:
                             lock.acquire()
@@ -246,7 +246,7 @@ class Sync(object):
                             lock.release()
             except Exception as e:
                 ExceptionUtils.exception_traceback(e)
-                log.error("【Sync】发生错误：%s - %s" % (str(e), traceback.format_exc()))
+                log.Logger().error("【Sync】发生错误：%s - %s" % (str(e), traceback.format_exc()))
 
     def transfer_mon_files(self):
         """
@@ -257,7 +257,7 @@ class Sync(object):
             finished_paths = []
             for path in list(self._need_sync_paths):
                 if not PathUtils.is_invalid_path(path) and os.path.exists(path):
-                    log.info("【Sync】开始转移监控目录文件...")
+                    log.Logger().info("【Sync】开始转移监控目录文件...")
                     target_info = self._need_sync_paths.get(path)
                     bluray_dir = PathUtils.get_bluray_dir(path)
                     if not bluray_dir:
@@ -286,7 +286,7 @@ class Sync(object):
                                                                     rmt_mode=sync_mode,
                                                                     root_path=is_root_path)
                     if not ret:
-                        log.warn("【Sync】%s转移失败：%s" % (path, ret_msg))
+                        log.Logger().warn("【Sync】%s转移失败：%s" % (path, ret_msg))
                 self._need_sync_paths.pop(path)
         finally:
             lock.release()
@@ -309,10 +309,10 @@ class Sync(object):
                     observer.schedule(FileMonitorHandler(monpath, self), path=monpath, recursive=True)
                     observer.daemon = True
                     observer.start()
-                    log.info("%s 的监控服务启动" % monpath)
+                    log.Logger().info("%s 的监控服务启动" % monpath)
                 except Exception as e:
                     ExceptionUtils.exception_traceback(e)
-                    log.error("%s 启动目录监控失败：%s" % (monpath, str(e)))
+                    log.Logger().error("%s 启动目录监控失败：%s" % (monpath, str(e)))
 
     def stop_service(self):
         """
@@ -341,16 +341,16 @@ class Sync(object):
                 for link_file in PathUtils.get_dir_files(monpath):
                     if self.dbhelper.is_sync_in_history(link_file, target_path):
                         continue
-                    log.info("【Sync】开始同步 %s" % link_file)
+                    log.Logger().info("【Sync】开始同步 %s" % link_file)
                     ret, msg = self.filetransfer.link_sync_file(src_path=monpath,
                                                                 in_file=link_file,
                                                                 target_dir=target_path,
                                                                 sync_transfer_mode=sync_mode)
                     if ret != 0:
-                        log.warn("【Sync】%s 同步失败，错误码：%s" % (link_file, ret))
+                        log.Logger().warn("【Sync】%s 同步失败，错误码：%s" % (link_file, ret))
                     elif not msg:
                         self.dbhelper.insert_sync_history(link_file, monpath, target_path)
-                        log.info("【Sync】%s 同步完成" % link_file)
+                        log.Logger().info("【Sync】%s 同步完成" % link_file)
             else:
                 for path in PathUtils.get_dir_level1_medias(monpath, RMT_MEDIAEXT):
                     if PathUtils.is_invalid_path(path):
@@ -361,7 +361,7 @@ class Sync(object):
                                                                     unknown_dir=unknown_path,
                                                                     rmt_mode=sync_mode)
                     if not ret:
-                        log.error("【Sync】%s 处理失败：%s" % (monpath, ret_msg))
+                        log.Logger().error("【Sync】%s 处理失败：%s" % (monpath, ret_msg))
 
 
 def run_monitor():
@@ -372,7 +372,7 @@ def run_monitor():
         Sync().run_service()
     except Exception as err:
         ExceptionUtils.exception_traceback(err)
-        log.error("启动目录同步服务失败：%s" % str(err))
+        log.Logger().error("启动目录同步服务失败：%s" % str(err))
 
 
 def stop_monitor():
@@ -383,7 +383,7 @@ def stop_monitor():
         Sync().stop_service()
     except Exception as err:
         ExceptionUtils.exception_traceback(err)
-        log.error("停止目录同步服务失败：%s" % str(err))
+        log.Logger().error("停止目录同步服务失败：%s" % str(err))
 
 
 def restart_monitor():

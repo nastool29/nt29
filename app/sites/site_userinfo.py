@@ -33,7 +33,7 @@ class SiteUserInfo(object):
         self._site_schema = SubmoduleHelper.import_submodules('app.sites.siteuserinfo',
                                                               filter_func=lambda _, obj: hasattr(obj, 'schema'))
         self._site_schema.sort(key=lambda x: x.order)
-        log.debug(f"【Sites】加载站点解析：{self._site_schema}")
+        log.Logger().debug(f"【Sites】加载站点解析：{self._site_schema}")
         self.init_config()
 
     def init_config(self):
@@ -58,17 +58,17 @@ class SiteUserInfo(object):
         if not site_cookie:
             return None
         session = requests.Session()
-        log.debug(f"【Sites】站点 {site_name} url={url} site_cookie={site_cookie} ua={ua}")
+        log.Logger().debug(f"【Sites】站点 {site_name} url={url} site_cookie={site_cookie} ua={ua}")
         # 检测环境，有浏览器内核的优先使用仿真签到
         chrome = ChromeHelper()
         if emulate and chrome.get_status():
             if not chrome.visit(url=url, ua=ua, cookie=site_cookie):
-                log.error("【Sites】%s 无法打开网站" % site_name)
+                log.Logger().error("【Sites】%s 无法打开网站" % site_name)
                 return None
             # 循环检测是否过cf
             cloudflare = chrome.pass_cloudflare()
             if not cloudflare:
-                log.error("【Sites】%s 跳转站点失败" % site_name)
+                log.Logger().error("【Sites】%s 跳转站点失败" % site_name)
                 return None
             # 判断是否已签到
             html_text = chrome.get_html()
@@ -106,7 +106,7 @@ class SiteUserInfo(object):
                         if not html_text:
                             return None
                     else:
-                        log.error("【Sites】站点 %s 被反爬限制：%s, 状态码：%s" % (site_name, url, res.status_code))
+                        log.Logger().error("【Sites】站点 %s 被反爬限制：%s, 状态码：%s" % (site_name, url, res.status_code))
                         return None
 
                 # 兼容假首页情况，假首页通常没有 <link rel="search" 属性
@@ -125,15 +125,15 @@ class SiteUserInfo(object):
                         if not html_text:
                             return None
             elif res is not None:
-                log.error(f"【Sites】站点 {site_name} 连接失败，状态码：{res.status_code}")
+                log.Logger().error(f"【Sites】站点 {site_name} 连接失败，状态码：{res.status_code}")
                 return None
             else:
-                log.error(f"【Sites】站点 {site_name} 无法访问：{url}")
+                log.Logger().error(f"【Sites】站点 {site_name} 无法访问：{url}")
                 return None
         # 解析站点类型
         site_schema = self.__build_class(html_text)
         if not site_schema:
-            log.error("【Sites】站点 %s 无法识别站点类型" % site_name)
+            log.Logger().error("【Sites】站点 %s 无法识别站点类型" % site_name)
             return None
         return site_schema(site_name, url, site_cookie, html_text, session=session, ua=ua)
 
@@ -160,10 +160,10 @@ class SiteUserInfo(object):
                                         emulate=chrome,
                                         proxy=proxy)
             if site_user_info:
-                log.debug(f"【Sites】站点 {site_name} 开始以 {site_user_info.site_schema()} 模型解析")
+                log.Logger().debug(f"【Sites】站点 {site_name} 开始以 {site_user_info.site_schema()} 模型解析")
                 # 开始解析
                 site_user_info.parse()
-                log.debug(f"【Sites】站点 {site_name} 解析完成")
+                log.Logger().debug(f"【Sites】站点 {site_name} 解析完成")
 
                 # 获取不到数据时，仅返回错误信息，不做历史数据更新
                 if site_user_info.err_msg:
@@ -196,7 +196,7 @@ class SiteUserInfo(object):
 
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【Sites】站点 {site_name} 获取流量数据失败：{str(e)}")
+            log.Logger().error(f"【Sites】站点 {site_name} 获取流量数据失败：{str(e)}")
 
     def __notify_unread_msg(self, site_name, site_user_info, unread_msg_notify):
         if site_user_info.message_unread <= 0:

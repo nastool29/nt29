@@ -67,10 +67,10 @@ class DoubanSync:
         同步豆瓣数据
         """
         if not self._interval:
-            log.info("【Douban】豆瓣配置：同步间隔未配置或配置不正确")
+            log.Logger().info("【Douban】豆瓣配置：同步间隔未配置或配置不正确")
             return
         with lock:
-            log.info("【Douban】开始同步豆瓣数据...")
+            log.Logger().info("【Douban】开始同步豆瓣数据...")
             # 拉取豆瓣数据
             medias = self.__get_all_douban_movies()
             # 开始检索
@@ -92,14 +92,14 @@ class DoubanSync:
                                                                    mtype=media.type)
                             # 不需要自动加订阅，则直接搜索
                             if not media_info or not media_info.tmdb_info:
-                                log.warn("【Douban】%s 未查询到媒体信息" % media.get_name())
+                                log.Logger().warn("【Douban】%s 未查询到媒体信息" % media.get_name())
                                 continue
                             # 检查是否存在，电视剧返回不存在的集清单
                             exist_flag, no_exists, _ = self.downloader.check_exists_medias(meta_info=media_info)
                             # 已经存在
                             if exist_flag:
                                 # 更新为已下载状态
-                                log.info("【Douban】%s 已存在" % media.get_name())
+                                log.Logger().info("【Douban】%s 已存在" % media.get_name())
                                 self.dbhelper.insert_douban_media_state(media, "DOWNLOADED")
                                 continue
                             if not self._auto_rss:
@@ -116,7 +116,7 @@ class DoubanSync:
                                     self.dbhelper.insert_douban_media_state(media, "DOWNLOADED")
                             else:
                                 # 需要加订阅，则由订阅去检索
-                                log.info(
+                                log.Logger().info(
                                     "【Douban】%s %s 更新到%s订阅中..." % (media.get_name(), media.year, media.type.value))
                                 code, msg, _ = self.subscribe.add_rss_subscribe(mtype=media.type,
                                                                                 name=media.get_name(),
@@ -124,7 +124,7 @@ class DoubanSync:
                                                                                 season=media.begin_season,
                                                                                 mediaid=f"DB:{media.douban_id}")
                                 if code != 0:
-                                    log.error("【Douban】%s 添加订阅失败：%s" % (media.get_name(), msg))
+                                    log.Logger().error("【Douban】%s 添加订阅失败：%s" % (media.get_name(), msg))
                                     # 订阅已存在
                                     if code == 9:
                                         self.dbhelper.insert_douban_media_state(media, "RSS")
@@ -138,7 +138,7 @@ class DoubanSync:
                             # 不需要检索
                             if self._auto_rss:
                                 # 加入订阅，使状态为R
-                                log.info("【Douban】%s %s 更新到%s订阅中..." % (
+                                log.Logger().info("【Douban】%s %s 更新到%s订阅中..." % (
                                     media.get_name(), media.year, media.type.value))
                                 code, msg, _ = self.subscribe.add_rss_subscribe(mtype=media.type,
                                                                                 name=media.get_name(),
@@ -147,7 +147,7 @@ class DoubanSync:
                                                                                 mediaid=f"DB:{media.douban_id}",
                                                                                 state="R")
                                 if code != 0:
-                                    log.error("【Douban】%s 添加订阅失败：%s" % (media.get_name(), msg))
+                                    log.Logger().error("【Douban】%s 添加订阅失败：%s" % (media.get_name(), msg))
                                     # 订阅已存在
                                     if code == 9:
                                         self.dbhelper.insert_douban_media_state(media, "RSS")
@@ -158,16 +158,16 @@ class DoubanSync:
                                     # 插入为已RSS状态
                                     self.dbhelper.insert_douban_media_state(media, "RSS")
                             elif not search_state:
-                                log.info("【Douban】%s %s 更新到%s列表中..." % (
+                                log.Logger().info("【Douban】%s %s 更新到%s列表中..." % (
                                     media.get_name(), media.year, media.type.value))
                                 self.dbhelper.insert_douban_media_state(media, "NEW")
 
                     else:
-                        log.info("【Douban】%s %s 已处理过" % (media.get_name(), media.year))
+                        log.Logger().info("【Douban】%s %s 已处理过" % (media.get_name(), media.year))
                 except Exception as err:
-                    log.error("【Douban】%s %s 处理失败：%s" % (media.get_name(), media.year, str(err)))
+                    log.Logger().error("【Douban】%s %s 处理失败：%s" % (media.get_name(), media.year, str(err)))
                     continue
-            log.info("【Douban】豆瓣数据同步完成")
+            log.Logger().info("【Douban】豆瓣数据同步完成")
 
     def __get_all_douban_movies(self):
         """
@@ -178,7 +178,7 @@ class DoubanSync:
                 or not self._days \
                 or not self._users \
                 or not self._types:
-            log.warn("【Douban】豆瓣未配置或配置不正确")
+            log.Logger().warn("【Douban】豆瓣未配置或配置不正确")
             return []
         # 返回媒体列表
         media_list = []
@@ -200,7 +200,7 @@ class DoubanSync:
             for mtype in self._types:
                 if not mtype:
                     continue
-                log.info(f"【Douban】开始获取 {user_name or user} 的 {mtype} 数据...")
+                log.Logger().info(f"【Douban】开始获取 {user_name or user} 的 {mtype} 数据...")
                 # 开始序号
                 start_number = 0
                 # 类型成功数量
@@ -213,11 +213,11 @@ class DoubanSync:
                     sucess_urlnum = 0
                     # 是否继续下一页
                     continue_next_page = True
-                    log.debug(f"【Douban】开始解析第 {page_number} 页数据...")
+                    log.Logger().debug(f"【Douban】开始解析第 {page_number} 页数据...")
                     try:
                         items = self.douban.get_douban_wish(dtype=mtype, userid=user, start=start_number, wait=True)
                         if not items:
-                            log.warn(f"【Douban】第 {page_number} 页未获取到数据")
+                            log.Logger().warn(f"【Douban】第 {page_number} 页未获取到数据")
                             break
                         # 解析豆瓣ID
                         for item in items:
@@ -233,7 +233,7 @@ class DoubanSync:
                                     break
                             doubanid = item.get("id")
                             if str(doubanid).isdigit():
-                                log.info("【Douban】解析到媒体：%s" % doubanid)
+                                log.Logger().info("【Douban】解析到媒体：%s" % doubanid)
                                 if doubanid not in douban_ids:
                                     douban_ids[doubanid] = {
                                         "user_name": user_name
@@ -241,11 +241,11 @@ class DoubanSync:
                                 sucess_urlnum += 1
                                 user_type_succnum += 1
                                 user_succnum += 1
-                        log.debug(
+                        log.Logger().debug(
                             f"【Douban】{user_name or user} 第 {page_number} 页解析完成，共获取到 {sucess_urlnum} 个媒体")
                     except Exception as err:
                         ExceptionUtils.exception_traceback(err)
-                        log.error(f"【Douban】{user_name or user} 第 {page_number} 页解析出错：%s" % str(err))
+                        log.Logger().error(f"【Douban】{user_name or user} 第 {page_number} 页解析出错：%s" % str(err))
                         break
                     # 继续下一页
                     if continue_next_page:
@@ -253,23 +253,23 @@ class DoubanSync:
                     else:
                         break
                 # 当前类型解析结束
-                log.debug(f"【Douban】用户 {user_name or user} 的 {mtype} 解析完成，共获取到 {user_type_succnum} 个媒体")
-            log.info(f"【Douban】用户 {user_name or user} 解析完成，共获取到 {user_succnum} 个媒体")
-        log.info(f"【Douban】所有用户解析完成，共获取到 {len(douban_ids)} 个媒体")
+                log.Logger().debug(f"【Douban】用户 {user_name or user} 的 {mtype} 解析完成，共获取到 {user_type_succnum} 个媒体")
+            log.Logger().info(f"【Douban】用户 {user_name or user} 解析完成，共获取到 {user_succnum} 个媒体")
+        log.Logger().info(f"【Douban】所有用户解析完成，共获取到 {len(douban_ids)} 个媒体")
         # 查询豆瓣详情
         for doubanid, info in douban_ids.items():
             douban_info = self.douban.get_douban_detail(doubanid=doubanid, wait=True)
             # 组装媒体信息
             if not douban_info:
-                log.warn("【Douban】%s 未正确获取豆瓣详细信息，尝试使用网页获取" % doubanid)
+                log.Logger().warn("【Douban】%s 未正确获取豆瓣详细信息，尝试使用网页获取" % doubanid)
                 douban_info = self.douban.get_media_detail_from_web(doubanid)
                 if not douban_info:
-                    log.warn("【Douban】%s 无权限访问，需要配置豆瓣Cookie" % doubanid)
+                    log.Logger().warn("【Douban】%s 无权限访问，需要配置豆瓣Cookie" % doubanid)
                     # 随机休眠
                     sleep(round(random.uniform(1, 5), 1))
                     continue
             media_type = MediaType.TV if douban_info.get("episodes_count") else MediaType.MOVIE
-            log.info("【Douban】%s：%s %s".strip() % (media_type.value, douban_info.get("title"), douban_info.get("year")))
+            log.Logger().info("【Douban】%s：%s %s".strip() % (media_type.value, douban_info.get("title"), douban_info.get("year")))
             meta_info = MetaInfo(title="%s %s" % (douban_info.get("title"), douban_info.get("year") or ""))
             meta_info.douban_id = doubanid
             meta_info.type = media_type

@@ -46,21 +46,21 @@ class Rss:
             return
 
         with lock:
-            log.info("【Rss】开始RSS订阅...")
+            log.Logger().info("【Rss】开始RSS订阅...")
 
             # 读取电影订阅
             rss_movies = self.subscribe.get_subscribe_movies(state='R')
             if not rss_movies:
-                log.warn("【Rss】没有正在订阅的电影")
+                log.Logger().warn("【Rss】没有正在订阅的电影")
             else:
-                log.info("【Rss】电影订阅清单：%s"
+                log.Logger().info("【Rss】电影订阅清单：%s"
                          % " ".join('%s' % info.get("name") for _, info in rss_movies.items()))
             # 读取电视剧订阅
             rss_tvs = self.subscribe.get_subscribe_tvs(state='R')
             if not rss_tvs:
-                log.warn("【Rss】没有正在订阅的电视剧")
+                log.Logger().warn("【Rss】没有正在订阅的电视剧")
             else:
-                log.info("【Rss】电视剧订阅清单：%s"
+                log.Logger().info("【Rss】电视剧订阅清单：%s"
                          % " ".join('%s' % info.get("name") for _, info in rss_tvs.items()))
             # 没有订阅退出
             if not rss_movies and not rss_tvs:
@@ -105,7 +105,7 @@ class Rss:
                 # 站点rss链接
                 rss_url = site_info.get("rssurl")
                 if not rss_url:
-                    log.info(f"【Rss】{site_name} 未配置rssurl，跳过...")
+                    log.Logger().info(f"【Rss】{site_name} 未配置rssurl，跳过...")
                     continue
                 site_cookie = site_info.get("cookie")
                 site_ua = site_info.get("ua")
@@ -116,17 +116,17 @@ class Rss:
                 # 使用的规则
                 site_fliter_rule = site_info.get("rule")
                 # 开始下载RSS
-                log.info(f"【Rss】正在处理：{site_name}")
+                log.Logger().info(f"【Rss】正在处理：{site_name}")
                 if site_info.get("pri"):
                     site_order = 100 - int(site_info.get("pri"))
                 else:
                     site_order = 0
                 rss_acticles = self.parse_rssxml(rss_url)
                 if not rss_acticles:
-                    log.warn(f"【Rss】{site_name} 未下载到数据")
+                    log.Logger().warn(f"【Rss】{site_name} 未下载到数据")
                     continue
                 else:
-                    log.info(f"【Rss】{site_name} 获取数据：{len(rss_acticles)}")
+                    log.Logger().info(f"【Rss】{site_name} 获取数据：{len(rss_acticles)}")
                 # 处理RSS结果
                 res_num = 0
                 for article in rss_acticles:
@@ -140,10 +140,10 @@ class Rss:
                         # 种子大小
                         size = article.get('size')
                         # 开始处理
-                        log.info(f"【Rss】开始处理：{title}")
+                        log.Logger().info(f"【Rss】开始处理：{title}")
                         # 检查这个种子是不是下过了
                         if self.dbhelper.is_torrent_rssd(enclosure):
-                            log.info(f"【Rss】{title} 已成功订阅过")
+                            log.Logger().info(f"【Rss】{title} 已成功订阅过")
                             continue
                         # 识别种子名称，开始检索TMDB
                         media_info = MetaInfo(title=title)
@@ -158,10 +158,10 @@ class Rss:
                             # 重新查询TMDB
                             media_info = self.media.get_media_info(title=title)
                             if not media_info:
-                                log.warn(f"【Rss】{title} 无法识别出媒体信息！")
+                                log.Logger().warn(f"【Rss】{title} 无法识别出媒体信息！")
                                 continue
                             elif not media_info.tmdb_info:
-                                log.info(f"【Rss】{title} 识别为 {media_info.get_name()} 未匹配到TMDB媒体信息")
+                                log.Logger().info(f"【Rss】{title} 识别为 {media_info.get_name()} 未匹配到TMDB媒体信息")
                         # 大小及种子页面
                         media_info.set_torrent_info(size=size,
                                                     page_url=page_url,
@@ -179,7 +179,7 @@ class Rss:
                             site_ua=site_ua,
                             site_proxy=site_proxy)
                         for msg in match_msg:
-                            log.info(f"【Rss】{msg}")
+                            log.Logger().info(f"【Rss】{msg}")
 
                         # 未匹配
                         if not match_flag:
@@ -240,7 +240,7 @@ class Rss:
                                                                                       source=library_no_exists,
                                                                                       title=media_info.tmdb_id)
                                     if rss_no_exists.get(media_info.tmdb_id):
-                                        log.info("【Rss】%s 订阅缺失季集：%s" % (
+                                        log.Logger().info("【Rss】%s 订阅缺失季集：%s" % (
                                             media_info.get_title_string(),
                                             rss_no_exists.get(media_info.tmdb_id)
                                         ))
@@ -252,7 +252,7 @@ class Rss:
                                 # 洗版时季集不完整的资源不要
                                 if media_info.type != MediaType.MOVIE \
                                         and media_info.get_episode_list():
-                                    log.info(
+                                    log.Logger().info(
                                         f"【Rss】{media_info.get_title_string()}{media_info.get_season_string()} "
                                         f"正在洗版，过滤掉季集不完整的资源：{title}"
                                     )
@@ -261,7 +261,7 @@ class Rss:
                                         rtype=media_info.type,
                                         rssid=match_info.get("id"),
                                         res_order=match_info.get("res_order")):
-                                    log.info(
+                                    log.Logger().info(
                                         f"【Rss】{media_info.get_title_string()}{media_info.get_season_string()} "
                                         f"正在洗版，跳过低优先级或同优先级资源：{title}"
                                     )
@@ -289,10 +289,10 @@ class Rss:
                             res_num = res_num + 1
                     except Exception as e:
                         ExceptionUtils.exception_traceback(e)
-                        log.error("【Rss】处理RSS发生错误：%s" % str(e))
+                        log.Logger().error("【Rss】处理RSS发生错误：%s" % str(e))
                         continue
-                log.info("【Rss】%s 处理结束，匹配到 %s 个有效资源" % (site_name, res_num))
-            log.info("【Rss】所有RSS处理结束，共 %s 个有效资源" % len(rss_download_torrents))
+                log.Logger().info("【Rss】%s 处理结束，匹配到 %s 个有效资源" % (site_name, res_num))
+            log.Logger().info("【Rss】所有RSS处理结束，共 %s 个有效资源" % len(rss_download_torrents))
             # 开始择优下载
             self.download_rss_torrent(rss_download_torrents=rss_download_torrents,
                                       rss_no_exists=rss_no_exists)
@@ -320,7 +320,7 @@ class Rss:
             ret.encoding = ret.apparent_encoding
         except Exception as e2:
             ExceptionUtils.exception_traceback(e2)
-            log.console(str(e2))
+            log.Logger().info(str(e2))
             return []
         if ret:
             ret_xml = ret.text
@@ -623,6 +623,6 @@ class Rss:
                 else:
                     # 更新电视剧缺失剧集
                     __update_tv_rss(item, left_medias.get(item.tmdb_id))
-            log.info("【Rss】实际下载了 %s 个资源" % len(download_items))
+            log.Logger().info("【Rss】实际下载了 %s 个资源" % len(download_items))
         else:
-            log.info("【Rss】未下载到任何资源")
+            log.Logger().info("【Rss】未下载到任何资源")

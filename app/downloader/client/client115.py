@@ -38,7 +38,7 @@ class Client115(_IDownloadClient):
             return False
         ret = self.downclient.login()
         if not ret:
-            log.info(self.downclient.err)
+            log.Logger().info(self.downclient.err)
             return False
         return True
 
@@ -48,7 +48,7 @@ class Client115(_IDownloadClient):
             return tlist
         ret, tasks = self.downclient.gettasklist(page=1)
         if not ret:
-            log.info(f"【{self.client_type}】获取任务列表错误：{self.downclient.err}")
+            log.Logger().info(f"【{self.client_type}】获取任务列表错误：{self.downclient.err}")
             return tlist
         if tasks:
             for task in tasks:
@@ -85,11 +85,11 @@ class Client115(_IDownloadClient):
         if isinstance(content, str):
             ret, self.lasthash = self.downclient.addtask(tdir=download_dir, content=content)
             if not ret:
-                log.error(f"【{self.client_type}】添加下载任务失败：{self.downclient.err}")
+                log.Logger().error(f"【{self.client_type}】添加下载任务失败：{self.downclient.err}")
                 return None
             return self.lasthash
         else:
-            log.info(f"【{self.client_type}】暂时不支持非链接下载")
+            log.Logger().info(f"【{self.client_type}】暂时不支持非链接下载")
             return None
 
     def delete_torrents(self, delete_file, ids):

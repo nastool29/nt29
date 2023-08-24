@@ -60,11 +60,11 @@ class Emby(_IMediaClient):
             if res:
                 return res.json()
             else:
-                log.error(f"【{self.server_type}】Library/SelectableMediaFolders 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Library/SelectableMediaFolders 未获取到返回数据")
                 return []
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Library/SelectableMediaFolders 出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Library/SelectableMediaFolders 出错：" + str(e))
             return []
 
     def get_admin_user(self):
@@ -82,10 +82,10 @@ class Emby(_IMediaClient):
                     if user.get("Policy", {}).get("IsAdministrator"):
                         return user.get("Id")
             else:
-                log.error(f"【{self.server_type}】Users 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Users 未获取到返回数据")
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Users出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Users出错：" + str(e))
         return None
 
     def get_user_count(self):
@@ -100,11 +100,11 @@ class Emby(_IMediaClient):
             if res:
                 return res.json().get("TotalRecordCount")
             else:
-                log.error(f"【{self.server_type}】Users/Query 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Users/Query 未获取到返回数据")
                 return 0
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Users/Query出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Users/Query出错：" + str(e))
             return 0
 
     def get_activity_log(self, num):
@@ -134,11 +134,11 @@ class Emby(_IMediaClient):
                         activity = {"type": event_type, "event": event_str, "date": event_date}
                         ret_array.append(activity)
             else:
-                log.error(f"【{self.server_type}】System/ActivityLog/Entries 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】System/ActivityLog/Entries 未获取到返回数据")
                 return []
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接System/ActivityLog/Entries出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接System/ActivityLog/Entries出错：" + str(e))
             return []
         return ret_array[:num]
 
@@ -155,11 +155,11 @@ class Emby(_IMediaClient):
             if res:
                 return res.json()
             else:
-                log.error(f"【{self.server_type}】Items/Counts 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Items/Counts 未获取到返回数据")
                 return {}
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items/Counts出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items/Counts出错：" + str(e))
             return {}
 
     def __get_emby_series_id_by_name(self, name, year):
@@ -184,7 +184,7 @@ class Emby(_IMediaClient):
                             return res_item.get('Id')
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items出错：" + str(e))
             return None
         return ""
 
@@ -213,7 +213,7 @@ class Emby(_IMediaClient):
                             return ret_movies
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items出错：" + str(e))
             return None
         return []
 
@@ -254,7 +254,7 @@ class Emby(_IMediaClient):
                 return exists_episodes
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Shows/Id/Episodes出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Shows/Id/Episodes出错：" + str(e))
             return None
         return []
 
@@ -292,11 +292,11 @@ class Emby(_IMediaClient):
                     if image.get("ProviderName") == "TheMovieDb" and image.get("Type") == image_type:
                         return image.get("Url")
             else:
-                log.error(f"【{self.server_type}】Items/RemoteImages 未获取到返回数据")
+                log.Logger().error(f"【{self.server_type}】Items/RemoteImages 未获取到返回数据")
                 return None
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items/Id/RemoteImages出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items/Id/RemoteImages出错：" + str(e))
             return None
         return None
 
@@ -312,10 +312,10 @@ class Emby(_IMediaClient):
             if res:
                 return True
             else:
-                log.info(f"【{self.server_type}】刷新媒体库对象 {item_id} 失败，无法连接Emby！")
+                log.Logger().info(f"【{self.server_type}】刷新媒体库对象 {item_id} 失败，无法连接Emby！")
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Items/Id/Refresh出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Items/Id/Refresh出错：" + str(e))
             return False
         return False
 
@@ -331,10 +331,10 @@ class Emby(_IMediaClient):
             if res:
                 return True
             else:
-                log.info(f"【{self.server_type}】刷新媒体库失败，无法连接Emby！")
+                log.Logger().info(f"【{self.server_type}】刷新媒体库失败，无法连接Emby！")
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Library/Refresh出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Library/Refresh出错：" + str(e))
             return False
         return False
 
@@ -346,7 +346,7 @@ class Emby(_IMediaClient):
         if not items:
             return
         # 收集要刷新的媒体库信息
-        log.info(f"【{self.server_type}】开始刷新Emby媒体库...")
+        log.Logger().info(f"【{self.server_type}】开始刷新Emby媒体库...")
         library_ids = []
         for item in items:
             if not item:
@@ -361,7 +361,7 @@ class Emby(_IMediaClient):
         for library_id in library_ids:
             if library_id != "/":
                 self.__refresh_emby_library_by_id(library_id)
-        log.info(f"【{self.server_type}】Emby媒体库刷新完成")
+        log.Logger().info(f"【{self.server_type}】Emby媒体库刷新完成")
 
     def __get_emby_library_id_by_item(self, item):
         """
@@ -468,7 +468,7 @@ class Emby(_IMediaClient):
                             yield item
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
-            log.error(f"【{self.server_type}】连接Users/Items出错：" + str(e))
+            log.Logger().error(f"【{self.server_type}】连接Users/Items出错：" + str(e))
         yield {}
 
     def get_playing_sessions(self):

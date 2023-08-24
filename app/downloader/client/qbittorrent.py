@@ -76,7 +76,7 @@ class Qbittorrent(_IDownloadClient):
             return qbt
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
-            log.error(f"【{self.client_type}】qBittorrent连接出错：{str(err)}")
+            log.Logger().error(f"【{self.client_type}】qBittorrent连接出错：{str(err)}")
             return None
 
     def get_status(self):
@@ -145,7 +145,7 @@ class Qbittorrent(_IDownloadClient):
             # 超级做种
             if self._force_upload:
                 self.qbc.torrents_set_force_start(enable=True, torrent_hashes=ids)
-            log.info(f"【{self.client_type}】设置qBittorrent种子状态成功")
+            log.Logger().info(f"【{self.client_type}】设置qBittorrent种子状态成功")
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
 

@@ -95,7 +95,7 @@ class Scraper:
         :param file_name: 电影文件名，不含后缀
         """
         # 开始生成XML
-        log.info("【Scraper】正在生成电影NFO文件：%s" % file_name)
+        log.Logger().info("【Scraper】正在生成电影NFO文件：%s" % file_name)
         doc = minidom.Document()
         root = DomUtils.add_node(doc, doc, "movie")
         # 公共部分
@@ -131,7 +131,7 @@ class Scraper:
         :param out_path: 电视剧根目录
         """
         # 开始生成XML
-        log.info("【Scraper】正在生成电视剧NFO文件：%s" % out_path)
+        log.Logger().info("【Scraper】正在生成电视剧NFO文件：%s" % out_path)
         doc = minidom.Document()
         root = DomUtils.add_node(doc, doc, "tvshow")
         # 公共部分
@@ -162,7 +162,7 @@ class Scraper:
         :param season: 季号
         :param out_path: 电视剧季的目录
         """
-        log.info("【Scraper】正在生成季NFO文件：%s" % out_path)
+        log.Logger().info("【Scraper】正在生成季NFO文件：%s" % out_path)
         doc = minidom.Document()
         root = DomUtils.add_node(doc, doc, "season")
         # 添加时间
@@ -201,7 +201,7 @@ class Scraper:
         :param file_name: 电视剧文件名，不含后缀
         """
         # 开始生成集的信息
-        log.info("【Scraper】正在生成剧集NFO文件：%s" % file_name)
+        log.Logger().info("【Scraper】正在生成剧集NFO文件：%s" % file_name)
         # 集的信息
         episode_detail = {}
         for episode_info in tmdbinfo.get("episodes") or []:
@@ -270,15 +270,15 @@ class Scraper:
         if os.path.exists(image_path):
             return
         try:
-            log.info(f"【Scraper】正在下载{itype}图片：{url} ...")
+            log.Logger().info(f"【Scraper】正在下载{itype}图片：{url} ...")
             r = RequestUtils().get_res(url)
             if r:
                 with open(file=image_path,
                           mode="wb") as img:
                     img.write(r.content)
-                log.info(f"【Scraper】{itype}图片已保存：{out_path}")
+                log.Logger().info(f"【Scraper】{itype}图片已保存：{out_path}")
             else:
-                log.info(f"【Scraper】{itype}图片下载失败，请检查网络连通性")
+                log.Logger().info(f"【Scraper】{itype}图片下载失败，请检查网络连通性")
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
 
@@ -477,10 +477,10 @@ class Scraper:
                         else:
                             # 从视频文件生成缩略图
                             video_path = os.path.join(dir_path, file_name + file_ext)
-                            log.info(f"【Scraper】正在生成缩略图：{video_path} ...")
+                            log.Logger().info(f"【Scraper】正在生成缩略图：{video_path} ...")
                             FfmpegHelper().get_thumb_image_from_video(video_path=video_path,
                                                                       image_path=episode_thumb)
-                            log.info(f"【Scraper】缩略图生成完成：{episode_thumb}")
+                            log.Logger().info(f"【Scraper】缩略图生成完成：{episode_thumb}")
 
         except Exception as e:
             ExceptionUtils.exception_traceback(e)
@@ -510,7 +510,7 @@ class Scraper:
                     if director_douban:
                         director["name"] = director_douban.get("name")
                     else:
-                        log.info("【Scraper】豆瓣该影片或剧集无导演 %s 信息" % director.get("name"))
+                        log.Logger().info("【Scraper】豆瓣该影片或剧集无导演 %s 信息" % director.get("name"))
             # 演员
             if actors:
                 for actor in actors:
@@ -520,9 +520,9 @@ class Scraper:
                         if actor_douban.get("character") != "演员":
                             actor["character"] = actor_douban.get("character")[2:]
                     else:
-                        log.info("【Scraper】豆瓣该影片或剧集无演员 %s 信息" % actor.get("name"))
+                        log.Logger().info("【Scraper】豆瓣该影片或剧集无演员 %s 信息" % actor.get("name"))
         else:
-            log.info("【Scraper】豆瓣无该影片或剧集信息")
+            log.Logger().info("【Scraper】豆瓣无该影片或剧集信息")
         return directors, actors
 
     def __match_people_in_douban(self, people, peoples_douban):

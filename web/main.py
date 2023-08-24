@@ -1239,19 +1239,19 @@ def wechat():
         if not sVerifyMsgSig and not sVerifyTimeStamp and not sVerifyNonce:
             return "NAStool微信交互服务正常！<br>微信回调配置步聚：<br>1、在微信企业应用接收消息设置页面生成Token和EncodingAESKey并填入设置->消息通知->微信对应项，打开微信交互开关。<br>2、保存并重启本工具，保存并重启本工具，保存并重启本工具。<br>3、在微信企业应用接收消息设置页面输入此地址：http(s)://IP:PORT/wechat（IP、PORT替换为本工具的外网访问地址及端口，需要有公网IP并做好端口转发，最好有域名）。"
         sVerifyEchoStr = request.args.get("echostr")
-        log.debug("收到微信验证请求: echostr= %s" % sVerifyEchoStr)
+        log.Logger().debug("收到微信验证请求: echostr= %s" % sVerifyEchoStr)
         ret, sEchoStr = wxcpt.VerifyURL(sVerifyMsgSig, sVerifyTimeStamp, sVerifyNonce, sVerifyEchoStr)
         if ret != 0:
-            log.error("微信请求验证失败 VerifyURL ret: %s" % str(ret))
+            log.Logger().error("微信请求验证失败 VerifyURL ret: %s" % str(ret))
         # 验证URL成功，将sEchoStr返回给企业号
         return sEchoStr
     else:
         try:
             sReqData = request.data
-            log.debug("收到微信消息：%s" % str(sReqData))
+            log.Logger().debug("收到微信消息：%s" % str(sReqData))
             ret, sMsg = wxcpt.DecryptMsg(sReqData, sVerifyMsgSig, sVerifyTimeStamp, sVerifyNonce)
             if ret != 0:
-                log.error("解密微信消息失败 DecryptMsg ret = %s" % str(ret))
+                log.Logger().error("解密微信消息失败 DecryptMsg ret = %s" % str(ret))
                 return make_response("ok", 200)
             # 解析XML报文
             """
@@ -1283,7 +1283,7 @@ def wechat():
             user_id = DomUtils.tag_value(root_node, "FromUserName")
             # 没的消息类型和用户ID的消息不要
             if not msg_type or not user_id:
-                log.info("收到微信心跳报文...")
+                log.Logger().info("收到微信心跳报文...")
                 return make_response("ok", 200)
             # 解析消息内容
             content = ""
@@ -1291,7 +1291,7 @@ def wechat():
                 # 事件消息
                 event_key = DomUtils.tag_value(root_node, "EventKey")
                 if event_key:
-                    log.info("点击菜单：%s" % event_key)
+                    log.Logger().info("点击菜单：%s" % event_key)
                     keys = event_key.split('#')
                     if len(keys) > 2:
                         content = ModuleConf.WECHAT_MENU.get(keys[2])
@@ -1307,7 +1307,7 @@ def wechat():
             return make_response(content, 200)
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
-            log.error("微信消息处理发生错误：%s - %s" % (str(err), traceback.format_exc()))
+            log.Logger().error("微信消息处理发生错误：%s - %s" % (str(err), traceback.format_exc()))
             return make_response("ok", 200)
 
 
@@ -1315,10 +1315,10 @@ def wechat():
 @App.route('/plex', methods=['POST'])
 def plex_webhook():
     if not SecurityHelper().check_mediaserver_ip(request.remote_addr):
-        log.warn(f"非法IP地址的媒体服务器消息通知：{request.remote_addr}")
+        log.Logger().warn(f"非法IP地址的媒体服务器消息通知：{request.remote_addr}")
         return '不允许的IP地址请求'
     request_json = json.loads(request.form.get('payload', {}))
-    log.debug("收到Plex Webhook报文：%s" % str(request_json))
+    log.Logger().debug("收到Plex Webhook报文：%s" % str(request_json))
     ThreadHelper().start_thread(WebhookEvent().plex_action, (request_json,))
     ThreadHelper().start_thread(SpeedLimiter().plex_action, (request_json,))
     return 'Ok'
@@ -1328,10 +1328,10 @@ def plex_webhook():
 @App.route('/jellyfin', methods=['POST'])
 def jellyfin_webhook():
     if not SecurityHelper().check_mediaserver_ip(request.remote_addr):
-        log.warn(f"非法IP地址的媒体服务器消息通知：{request.remote_addr}")
+        log.Logger().warn(f"非法IP地址的媒体服务器消息通知：{request.remote_addr}")
         return '不允许的IP地址请求'
     request_json = request.get_json()
-    log.debug("收到Jellyfin Webhook报文：%s" % str(request_json))
+    log.Logger().debug("收到Jellyfin Webhook报文：%s" % str(request_json))
     ThreadHelper().start_thread(WebhookEvent().jellyfin_action, (request_json,))
     ThreadHelper().start_thread(SpeedLimiter().jellyfin_action, (request_json,))
     return 'Ok'
@@ -1341,10 +1341,10 @@ def jellyfin_webhook():
 # Emby Webhook
 def emby_webhook():
     if not SecurityHelper().check_mediaserver_ip(request.remote_addr):
-        log.warn(f"非法IP地址的媒体服务器消息通知：{request.remote_addr}")
+        log.Logger().warn(f"非法IP地址的媒体服务器消息通知：{request.remote_addr}")
         return '不允许的IP地址请求'
     request_json = json.loads(request.form.get('data', {}))
-    log.debug("收到Emby Webhook报文：%s" % str(request_json))
+    log.Logger().debug("收到Emby Webhook报文：%s" % str(request_json))
     ThreadHelper().start_thread(WebhookEvent().emby_action, (request_json,))
     ThreadHelper().start_thread(SpeedLimiter().emby_action, (request_json,))
     return 'Ok'
@@ -1382,13 +1382,13 @@ def telegram():
         return 'NAStool未启用Telegram交互'
     msg_json = request.get_json()
     if not SecurityHelper().check_telegram_ip(request.remote_addr):
-        log.error("收到来自 %s 的非法Telegram消息：%s" % (request.remote_addr, msg_json))
+        log.Logger().error("收到来自 %s 的非法Telegram消息：%s" % (request.remote_addr, msg_json))
         return '不允许的IP地址请求'
     if msg_json:
         message = msg_json.get("message", {})
         text = message.get("text")
         user_id = message.get("from", {}).get("id")
-        log.info("收到Telegram消息：from=%s, text=%s" % (user_id, text))
+        log.Logger().info("收到Telegram消息：from=%s, text=%s" % (user_id, text))
         # 获取用户名
         user_name = message.get("from", {}).get("username")
         if text:
@@ -1429,16 +1429,16 @@ def synology():
         return 'NAStool未启用Synology Chat交互'
     msg_data = request.form
     if not SecurityHelper().check_synology_ip(request.remote_addr):
-        log.error("收到来自 %s 的非法Synology Chat消息：%s" % (request.remote_addr, msg_data))
+        log.Logger().error("收到来自 %s 的非法Synology Chat消息：%s" % (request.remote_addr, msg_data))
         return '不允许的IP地址请求'
     if msg_data:
         token = msg_data.get("token")
         if not interactive_client.get("client").check_token(token):
-            log.error("收到来自 %s 的非法Synology Chat消息：token校验不通过！" % request.remote_addr)
+            log.Logger().error("收到来自 %s 的非法Synology Chat消息：token校验不通过！" % request.remote_addr)
             return 'token校验不通过'
         text = msg_data.get("text")
         user_id = int(msg_data.get("user_id"))
-        log.info("收到Synology Chat消息：from=%s, text=%s" % (user_id, text))
+        log.Logger().info("收到Synology Chat消息：from=%s, text=%s" % (user_id, text))
         # 获取用户名
         user_name = msg_data.get("username")
         if text:
@@ -1547,7 +1547,7 @@ def slack():
     """
     # 只有本地转发请求能访问
     if not SecurityHelper().check_slack_ip(request.remote_addr):
-        log.warn(f"非法IP地址的Slack消息通知：{request.remote_addr}")
+        log.Logger().warn(f"非法IP地址的Slack消息通知：{request.remote_addr}")
         return '不允许的IP地址请求'
 
     # 当前在用的交互渠道

@@ -71,7 +71,7 @@ class TorrentRemover(object):
         if remove_flag:
             self._scheduler.print_jobs()
             self._scheduler.start()
-            log.info("自动删种服务启动")
+            log.Logger().info("自动删种服务启动")
 
     def get_torrent_remove_tasks(self, taskid=None):
         """
@@ -116,7 +116,7 @@ class TorrentRemover(object):
                     downloader=downloader_type,
                     config=task.get("config")
                 )
-                log.info(f"【TorrentRemover】自动删种任务：{task.get('name')} 获取符合处理条件种子数 {len(torrents)}")
+                log.Logger().info(f"【TorrentRemover】自动删种任务：{task.get('name')} 获取符合处理条件种子数 {len(torrents)}")
                 title = f"自动删种任务：{task.get('name')}"
                 text = ""
                 if task.get("action") == 1:
@@ -126,7 +126,7 @@ class TorrentRemover(object):
                         site = torrent.get("site")
                         size = round(torrent.get("size")/1021/1024/1024, 3)
                         text_item = f"{name} 来自站点：{site} 大小：{size} GB"
-                        log.info(f"【TorrentRemover】暂停种子：{text_item}")
+                        log.Logger().info(f"【TorrentRemover】暂停种子：{text_item}")
                         text = f"{text}\n{text_item}"
                         # 暂停种子
                         self.downloader.stop_torrents(downloader=downloader_type,
@@ -138,7 +138,7 @@ class TorrentRemover(object):
                         site = torrent.get("site")
                         size = round(torrent.get("size") / 1021 / 1024 / 1024, 3)
                         text_item = f"{name} 来自站点：{site} 大小：{size} GB"
-                        log.info(f"【TorrentRemover】删除种子：{text_item}")
+                        log.Logger().info(f"【TorrentRemover】删除种子：{text_item}")
                         text = f"{text}\n{text_item}"
                         # 删除种子
                         self.downloader.delete_torrents(downloader=downloader_type,
@@ -151,7 +151,7 @@ class TorrentRemover(object):
                         site = torrent.get("site")
                         size = round(torrent.get("size") / 1021 / 1024 / 1024, 3)
                         text_item = f"{name} 来自站点：{site} 大小：{size} GB"
-                        log.info(f"【TorrentRemover】删除种子及文件：{text_item}")
+                        log.Logger().info(f"【TorrentRemover】删除种子及文件：{text_item}")
                         text = f"{text}\n{text_item}"
                         # 删除种子
                         self.downloader.delete_torrents(downloader=downloader_type,
@@ -161,7 +161,7 @@ class TorrentRemover(object):
                     self.message.send_brushtask_remove_message(title=title, text=text)
             except Exception as e:
                 ExceptionUtils.exception_traceback(e)
-                log.error(f"【TorrentRemover】自动删种任务：{task.get('name')}异常：{str(e)}")
+                log.Logger().error(f"【TorrentRemover】自动删种任务：{task.get('name')}异常：{str(e)}")
             finally:
                 lock.release()
 

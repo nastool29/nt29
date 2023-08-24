@@ -1,3 +1,4 @@
+import logging
 import os
 import signal
 import sys
@@ -53,7 +54,7 @@ def sigal_handler(num, stack):
     信号处理
     """
     if SystemUtils.is_docker():
-        log.warn('捕捉到退出信号：%s，开始退出...' % num)
+        log.Logger().warn('捕捉到退出信号：%s，开始退出...' % num)
         # 停止虚拟显示
         DisplayHelper().quit()
         # 退出主进程
@@ -93,7 +94,7 @@ signal.signal(signal.SIGTERM, sigal_handler)
 
 def init_system():
     # 配置
-    log.console('NAStool 当前版本号：%s' % APP_VERSION)
+    log.Logger().info('NAStool 当前版本号：%s' % APP_VERSION)
     # 数据库初始化
     init_db()
     # 数据库更新
@@ -107,7 +108,7 @@ def init_system():
 
 
 def start_service():
-    log.console("开始启动服务...")
+    log.Logger().info("开始启动服务...")
     # 加载索引器配置
     IndexerHelper()
     # 启动虚拟显示
@@ -145,7 +146,7 @@ def monitor_config():
                 if ConfigLoadCache.get(event.src_path):
                     return
                 ConfigLoadCache.set(event.src_path, True)
-                log.console("进程 %s 检测到配置文件已修改，正在重新加载..." % os.getpid())
+                log.Logger().info("进程 %s 检测到配置文件已修改，正在重新加载..." % os.getpid())
                 time.sleep(1)
                 # 重新加载配置
                 Config().init_config()

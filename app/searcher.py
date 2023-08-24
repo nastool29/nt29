@@ -129,7 +129,7 @@ class Searcher:
                 if search_en_name:
                     second_search_name = search_en_name
         # 开始搜索
-        log.info("【Searcher】开始检索 %s ..." % first_search_name)
+        log.Logger().info("【Searcher】开始检索 %s ..." % first_search_name)
         media_list = self.search_medias(key_word=first_search_name,
                                         filter_args=filter_args,
                                         match_media=media_info,
@@ -138,14 +138,14 @@ class Searcher:
         if len(media_list) == 0 \
                 and second_search_name \
                 and second_search_name != first_search_name:
-            log.info("【Searcher】%s 未检索到资源,尝试通过 %s 重新检索 ..." % (first_search_name, second_search_name))
+            log.Logger().info("【Searcher】%s 未检索到资源,尝试通过 %s 重新检索 ..." % (first_search_name, second_search_name))
             media_list = self.search_medias(key_word=second_search_name,
                                             filter_args=filter_args,
                                             match_media=media_info,
                                             in_from=in_from)
 
         if len(media_list) == 0:
-            log.info("【Searcher】%s 未搜索到任何资源" % second_search_name)
+            log.Logger().info("【Searcher】%s 未搜索到任何资源" % second_search_name)
             return None, no_exists, 0, 0
         else:
             if in_from in self.message.get_search_types():
@@ -169,10 +169,10 @@ class Searcher:
                                                                          user_name=user_name)
             # 统计下载情况，下全了返回True，没下全返回False
             if not download_items:
-                log.info("【Searcher】%s 未下载到资源" % media_info.title)
+                log.Logger().info("【Searcher】%s 未下载到资源" % media_info.title)
                 return None, left_medias, len(media_list), 0
             else:
-                log.info("【Searcher】实际下载了 %s 个资源" % len(download_items))
+                log.Logger().info("【Searcher】实际下载了 %s 个资源" % len(download_items))
                 # 还有剩下的缺失，说明没下完，返回False
                 if left_medias:
                     return None, left_medias, len(media_list), len(download_items)

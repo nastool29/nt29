@@ -43,17 +43,17 @@ class DouBan:
                         self.cookie = StringUtils.str_from_cookiejar(res.cookies)
                 except Exception as err:
                     ExceptionUtils.exception_traceback(err)
-                    log.warn(f"【Douban】获取cookie失败：{format(err)}")
+                    log.Logger().warn(f"【Douban】获取cookie失败：{format(err)}")
 
     def get_douban_detail(self, doubanid, mtype=None, wait=False):
         """
         根据豆瓣ID返回豆瓣详情，带休眠
         """
-        log.info("【Douban】正在通过API查询豆瓣详情：%s" % doubanid)
+        log.Logger().info("【Douban】正在通过API查询豆瓣详情：%s" % doubanid)
         # 随机休眠
         if wait:
             time = round(random.uniform(1, 5), 1)
-            log.info("【Douban】随机休眠：%s 秒" % time)
+            log.Logger().info("【Douban】随机休眠：%s 秒" % time)
             sleep(time)
         if mtype == MediaType.MOVIE:
             douban_info = self.doubanapi.movie_detail(doubanid)
@@ -64,16 +64,16 @@ class DouBan:
             if not douban_info:
                 douban_info = self.doubanapi.tv_detail(doubanid)
         if not douban_info:
-            log.warn("【Douban】%s 未找到豆瓣详细信息" % doubanid)
+            log.Logger().warn("【Douban】%s 未找到豆瓣详细信息" % doubanid)
             return None
         if douban_info.get("localized_message"):
-            log.warn("【Douban】查询豆瓣详情错误：%s" % douban_info.get("localized_message"))
+            log.Logger().warn("【Douban】查询豆瓣详情错误：%s" % douban_info.get("localized_message"))
             return None
         if not douban_info.get("title"):
             return None
         if douban_info.get("title") == "未知电影" or douban_info.get("title") == "未知电视剧":
             return None
-        log.info("【Douban】查询到数据：%s" % douban_info.get("title"))
+        log.Logger().info("【Douban】查询到数据：%s" % douban_info.get("title"))
         return douban_info
 
     def __search_douban_id(self, metainfo):
@@ -138,7 +138,7 @@ class DouBan:
         """
         if wait:
             time = round(random.uniform(1, 5), 1)
-            log.info("【Douban】随机休眠：%s 秒" % time)
+            log.Logger().info("【Douban】随机休眠：%s 秒" % time)
             sleep(time)
         if dtype == "do":
             web_infos = self.doubanweb.do(cookie=self.cookie, userid=userid, start=start)
@@ -155,7 +155,7 @@ class DouBan:
     def get_user_info(self, userid, wait=False):
         if wait:
             time = round(random.uniform(1, 5), 1)
-            log.info("【Douban】随机休眠：%s 秒" % time)
+            log.Logger().info("【Douban】随机休眠：%s 秒" % time)
             sleep(time)
         return self.doubanweb.user(cookie=self.cookie, userid=userid)
 
@@ -209,7 +209,7 @@ class DouBan:
         :param doubanid: 豆瓣ID
         :return: {title, year, intro, cover_url, rating{value}, episodes_count}
         """
-        log.info("【Douban】正在通过网页查询豆瓣详情：%s" % doubanid)
+        log.Logger().info("【Douban】正在通过网页查询豆瓣详情：%s" % doubanid)
         web_info = self.doubanweb.detail(cookie=self.cookie, doubanid=doubanid)
         if not web_info:
             return {}
@@ -275,9 +275,9 @@ class DouBan:
         except Exception as err:
             ExceptionUtils.exception_traceback(err)
         if ret_media:
-            log.info("【Douban】查询到数据：%s" % ret_media.get("title"))
+            log.Logger().info("【Douban】查询到数据：%s" % ret_media.get("title"))
         else:
-            log.warn("【Douban】%s 未查询到豆瓣数据：%s" % doubanid)
+            log.Logger().warn("【Douban】%s 未查询到豆瓣数据：%s" % doubanid)
         return ret_media
 
     def get_douban_online_movie(self, page=1):
